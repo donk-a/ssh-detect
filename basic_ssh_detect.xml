@@ -1,0 +1,36 @@
+<Sysmon schemaversion="4.30">
+    <!-- Capture SSHD Service Start/Stop Events -->
+    <ServiceStatus onmatch="include">
+        <ServiceName condition="is">sshd</ServiceName>
+    </ServiceStatus>
+
+    <!-- Capture Process Creation and Termination -->
+    <ProcessCreate onmatch="include">
+        <Image condition="is">/usr/sbin/sshd</Image>
+        <Image condition="end with">/sshd</Image>
+        <CommandLine condition="contains">sshd</CommandLine>
+    </ProcessCreate>
+
+    <!-- Capture Network Connections initiated by SSH -->
+    <NetworkConnect onmatch="include">
+        <Image condition="is">/usr/sbin/sshd</Image>
+        <DestinationPort condition="is">22</DestinationPort>
+        <Protocol condition="is">tcp</Protocol>
+    </NetworkConnect>
+
+    <!-- Capture File Creations/Modifications in SSH related directories -->
+    <FileCreate onmatch="include">
+        <TargetFilename condition="begin with">/etc/ssh/</TargetFilename>
+    </FileCreate>
+    <FileCreate onmatch="include">
+        <TargetFilename condition="begin with">/var/log/auth.log</TargetFilename>
+    </FileCreate>
+    <FileCreate onmatch="include">
+        <TargetFilename condition="begin with">/var/log/secure</TargetFilename>
+    </FileCreate>
+    
+    <!-- Capture SSH Login/Logout Events -->
+    <Login onmatch="include">
+        <Image condition="is">/usr/sbin/sshd</Image>
+    </Login>
+</Sysmon>
